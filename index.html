@@ -19,279 +19,363 @@
   --green: #34c97a;
   --amber: #f5a623;
   --red: #f05252;
-  --radius: 16px;
-  --radius-sm: 10px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
 
-.app { display: grid; grid-template-columns: 1fr 260px; grid-template-rows: auto 1fr auto; height: 100vh; }
+.app { display: flex; height: 100vh; }
 
-header {
-  grid-column: 1 / -1;
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+/* ─── LEFT PANEL ─── */
+.left-panel {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 24px 10px;
+  border-right: 1px solid var(--border);
+  gap: 6px;
+  overflow: hidden;
 }
 
-.avatar-wrap { position: relative; flex-shrink: 0; }
-.avatar-wrap svg { width: 52px; height: 52px; }
+.topic-bar { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.pill {
+  font-size: 11px; padding: 4px 13px; border-radius: 20px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: all 0.15s;
+}
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+.pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.avatar-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  width: 100%;
+}
+
+#rogelio-svg {
+  height: 100%;
+  max-height: 310px;
+  width: auto;
+  filter: drop-shadow(0 10px 40px rgba(79,126,248,0.18));
+  transition: transform 0.3s ease;
+}
+
+/* Expression animations */
+@keyframes headShake {
+  0%,100% { transform: translateX(0) rotate(0); }
+  15%     { transform: translateX(-12px) rotate(-5deg); }
+  35%     { transform: translateX(12px) rotate(5deg); }
+  55%     { transform: translateX(-8px) rotate(-3deg); }
+  75%     { transform: translateX(8px) rotate(3deg); }
+}
+@keyframes shoulderBounce {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  25%     { transform: translateY(-10px) rotate(-3deg); }
+  50%     { transform: translateY(3px) rotate(1deg); }
+  75%     { transform: translateY(-6px) rotate(-2deg); }
+}
+.avatar-shake  { animation: headShake 0.65s ease forwards; }
+.avatar-bounce { animation: shoulderBounce 0.55s ease 3 forwards; }
+
+.mood-text {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  min-height: 18px;
+  transition: all 0.3s;
+}
+.status-text {
+  font-size: 11px;
+  color: var(--amber);
+  min-height: 14px;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+/* Big mic button */
+.mic-big {
+  width: 68px; height: 68px; border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+}
+.mic-big:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+.mic-big.mic-on {
+  background: var(--red); border-color: var(--red); color: #fff;
+  animation: micPulse 1s infinite;
+}
+@keyframes micPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(240,82,82,0.45); }
+  50%     { box-shadow: 0 0 0 16px rgba(240,82,82,0); }
+}
 .status-dot {
-  position: absolute; bottom: 2px; right: 2px;
-  width: 11px; height: 11px; border-radius: 50%;
-  background: var(--green); border: 2px solid var(--surface);
+  position: absolute; top: 4px; right: 4px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--green); border: 2px solid var(--surface2);
   transition: background 0.3s;
 }
 .status-dot.listening { background: var(--amber); animation: blink 0.5s infinite alternate; }
 .status-dot.speaking  { background: var(--accent); animation: blink 0.8s infinite alternate; }
 @keyframes blink { to { opacity: 0.3; } }
 
-.header-info h1 { font-size: 16px; font-weight: 600; }
-.header-info p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-.topic-pills { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.pill {
-  font-size: 11px; padding: 4px 12px; border-radius: 20px;
+/* Input area */
+.input-area { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.chips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+.chip {
+  font-size: 10px; padding: 4px 10px; border-radius: 20px;
   border: 1px solid var(--border2); background: transparent;
-  color: var(--text2); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  color: var(--text3); cursor: pointer; transition: all 0.15s; white-space: nowrap;
 }
-.pill:hover { border-color: var(--accent); color: var(--accent); }
-.pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.input-row { display: flex; gap: 8px; align-items: flex-end; }
+textarea {
+  flex: 1; resize: none; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: 10px;
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 13px; padding: 8px 12px;
+  min-height: 38px; max-height: 80px; line-height: 1.5; outline: none;
+  transition: border 0.2s;
+}
+textarea::placeholder { color: var(--text3); }
+textarea:focus { border-color: var(--accent); }
+.btn-send {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--accent); border: none; color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.btn-send:hover { background: #3560d4; }
+.hint { font-size: 11px; color: var(--text3); text-align: center; min-height: 14px; }
 
+/* ─── RIGHT PANEL ─── */
+.right-panel {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.chat-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.chat-title { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; }
+.score-mini { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.score-mini span { font-size: 11px; color: var(--text2); font-weight: 500; }
+.score-track { width: 56px; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.score-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.7s ease; }
+
+/* Messages */
 #chat {
-  grid-column: 1; overflow-y: auto; padding: 20px;
-  display: flex; flex-direction: column; gap: 14px;
+  flex: 1; overflow-y: auto;
+  padding: 14px 14px;
+  display: flex; flex-direction: column; gap: 12px;
 }
-
-.bubble-wrap { display: flex; gap: 10px; align-items: flex-end; }
-.bubble-wrap.user { flex-direction: row-reverse; }
-
-.bav {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: linear-gradient(135deg, #2a3a8f, #4f7ef8);
-  flex-shrink: 0; display: flex; align-items: center;
-  justify-content: center; font-size: 12px; font-weight: 600; color: #fff;
+.msg-system { font-size: 10px; color: var(--text3); text-align: center; padding: 2px 0; }
+.msg-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 3px;
 }
-
-.bubble {
-  max-width: 72%; padding: 11px 15px; border-radius: 18px;
-  font-size: 14px; line-height: 1.6;
-}
-.bubble.rogelio {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-bottom-left-radius: 5px; color: var(--text);
-}
-.bubble.user {
-  background: var(--accent); border-bottom-right-radius: 5px; color: #fff;
-}
-.bubble.system {
-  background: none; border: none; color: var(--text3);
-  font-size: 12px; align-self: center; padding: 4px 0;
-}
+.msg-user .msg-label { text-align: right; }
+.msg-text { font-size: 12px; line-height: 1.55; color: var(--text); }
+.msg-user .msg-text { color: var(--text2); }
 
 .typing span {
-  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--text3); animation: dot 1.2s infinite; margin: 0 2px;
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text3); animation: dot 1.2s infinite; margin: 0 1px;
 }
 .typing span:nth-child(2) { animation-delay: 0.2s; }
 .typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes dot { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
 
-#feedback {
-  grid-column: 2; grid-row: 2 / 4;
-  border-left: 1px solid var(--border); background: var(--surface);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.fb-header { padding: 16px; border-bottom: 1px solid var(--border); }
-.fb-header h2 { font-size: 13px; font-weight: 600; }
-.fb-header p  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+/* Inline feedback */
+.msg-fb { margin-top: 5px; display: flex; flex-direction: column; gap: 2px; }
+.fbi { font-size: 10px; line-height: 1.45; display: block; }
+.fbi-good  { color: var(--green); }
+.fbi-fix   { color: var(--amber); }
+.fbi-fix del    { color: var(--text3); text-decoration: line-through; }
+.fbi-fix strong { color: var(--text); font-weight: 500; }
+.fbi-vocab { color: var(--accent); }
 
-#fb-body {
-  flex: 1; overflow-y: auto; padding: 12px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.fb-empty { color: var(--text3); font-size: 12px; text-align: center; padding: 24px 12px; line-height: 1.7; }
-.fb-card {
-  background: var(--surface2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 10px 12px;
-}
-.fb-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
-.fb-tag.good  { color: var(--green); }
-.fb-tag.fix   { color: var(--amber); }
-.fb-tag.vocab { color: var(--accent); }
-.fb-tag.mood  { color: var(--red); }
-.fb-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
-.fb-text strong { color: var(--text); font-weight: 500; }
-.fb-text del { color: var(--text3); text-decoration: line-through; }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-.score-area { padding: 12px 16px; border-top: 1px solid var(--border); }
-.score-top { font-size: 11px; color: var(--text3); margin-bottom: 7px; display: flex; justify-content: space-between; }
-.score-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-.score-fill  { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.7s ease; }
-
-#input-area {
-  grid-column: 1; padding: 14px 20px;
-  border-top: 1px solid var(--border); background: var(--surface);
-  display: flex; flex-direction: column; gap: 10px;
-}
-.chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.chip {
-  font-size: 11px; padding: 5px 12px; border-radius: 20px;
-  border: 1px solid var(--border2); background: transparent;
-  color: var(--text2); cursor: pointer; transition: all 0.15s;
-}
-.chip:hover { border-color: var(--accent); color: var(--accent); }
-
-.input-row { display: flex; gap: 10px; align-items: flex-end; }
-textarea {
-  flex: 1; resize: none; background: var(--surface2);
-  border: 1px solid var(--border2); border-radius: var(--radius-sm);
-  color: var(--text); font-family: 'Inter', sans-serif;
-  font-size: 14px; padding: 10px 14px;
-  min-height: 42px; max-height: 100px; line-height: 1.5; outline: none;
-  transition: border 0.2s;
-}
-textarea::placeholder { color: var(--text3); }
-textarea:focus { border-color: var(--accent); }
-
-.btn {
-  width: 42px; height: 42px; border-radius: 50%;
-  border: 1px solid var(--border2); background: var(--surface2);
-  color: var(--text2); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.btn:hover { background: var(--surface); color: var(--text); }
-.btn.mic-on { background: var(--red); border-color: var(--red); color: #fff; animation: mpulse 1s infinite; }
-@keyframes mpulse { 0%,100%{box-shadow:0 0 0 0 rgba(240,82,82,0.4)} 50%{box-shadow:0 0 0 8px rgba(240,82,82,0)} }
-.btn.send { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.send:hover { background: #3560d4; }
-
-.hint { font-size: 11px; color: var(--text3); text-align: center; min-height: 14px; }
-
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-
-@media (max-width: 600px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; }
-  #feedback { grid-column: 1; grid-row: 4; border-left: none; border-top: 1px solid var(--border); max-height: 180px; }
-  .topic-pills { display: none; }
+@media (max-width: 680px) {
+  .app { flex-direction: column; }
+  .left-panel  { width: 100%; height: 62vh; border-right: none; border-bottom: 1px solid var(--border); }
+  .right-panel { width: 100%; height: 38vh; }
 }
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="avatar-wrap">
-      <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" id="rogelio-svg">
-        <circle cx="26" cy="26" r="26" fill="#1e2230"/>
-        <circle cx="26" cy="26" r="26" fill="url(#bg-grad)"/>
-        <defs>
-          <radialGradient id="bg-grad" cx="50%" cy="30%">
-            <stop offset="0%" stop-color="#2a3a8f"/>
-            <stop offset="100%" stop-color="#0d1230"/>
-          </radialGradient>
-        </defs>
-        <!-- head -->
-        <ellipse cx="26" cy="22" rx="11" ry="12" fill="#f4c99a"/>
-        <!-- hair -->
-        <ellipse cx="26" cy="12" rx="11" ry="6" fill="#2c1a0e"/>
-        <rect x="15" y="12" width="22" height="5" fill="#2c1a0e"/>
-        <!-- ears -->
-        <ellipse cx="15" cy="22" rx="2.5" ry="3" fill="#f4c99a"/>
-        <ellipse cx="37" cy="22" rx="2.5" ry="3" fill="#f4c99a"/>
-        <!-- eyes -->
-        <ellipse id="eye-l" cx="21" cy="21" rx="2.5" ry="2.5" fill="#2c1a0e"/>
-        <ellipse id="eye-r" cx="31" cy="21" rx="2.5" ry="2.5" fill="#2c1a0e"/>
-        <circle cx="22" cy="20.5" r="0.8" fill="white"/>
-        <circle cx="32" cy="20.5" r="0.8" fill="white"/>
-        <!-- eyebrows -->
-        <path id="brow-l" d="M18.5 17.5 Q21 16.5 23.5 17.5" stroke="#2c1a0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <path id="brow-r" d="M28.5 17.5 Q31 16.5 33.5 17.5" stroke="#2c1a0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <!-- nose -->
-        <ellipse cx="26" cy="25" rx="1.5" ry="1" fill="#e8a87c"/>
-        <!-- mouth -->
-        <path id="mouth" d="M22 29 Q26 32 30 29" stroke="#c0734a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <!-- mustache -->
-        <path d="M22 27.5 Q24 26.5 26 27 Q28 26.5 30 27.5" stroke="#2c1a0e" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        <!-- body / shirt -->
-        <ellipse cx="26" cy="46" rx="14" ry="10" fill="#4f7ef8"/>
-        <rect x="12" y="38" width="28" height="14" fill="#4f7ef8" rx="4"/>
-        <!-- collar -->
-        <path d="M22 34 L26 40 L30 34" stroke="white" stroke-width="1.5" fill="none"/>
-        <!-- tie -->
-        <path d="M26 36 L24.5 42 L26 44 L27.5 42 Z" fill="#f5a623"/>
-      </svg>
-      <div class="status-dot" id="status-dot"></div>
-    </div>
-    <div class="header-info">
-      <h1>Rogelio</h1>
-      <p id="rogelio-mood">Your English conversation partner · Ready to chat</p>
-    </div>
-    <div class="topic-pills">
+
+  <!-- ══════════ LEFT PANEL ══════════ -->
+  <div class="left-panel">
+    <div class="topic-bar">
       <button class="pill active" onclick="setTopic('casual',this)">Casual</button>
       <button class="pill" onclick="setTopic('work',this)">Work</button>
       <button class="pill" onclick="setTopic('story',this)">Story</button>
       <button class="pill" onclick="setTopic('finance',this)">Finance</button>
     </div>
-  </header>
 
-  <div id="chat">
-    <div class="bubble-wrap">
-      <div class="bav">R</div>
-      <div class="bubble rogelio">Hey! Good to see you. So — what's going on? Tell me something interesting.</div>
+    <div class="avatar-stage">
+      <!-- ViewBox 200×260 — big expressive caricature -->
+      <svg id="rogelio-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bgGlow" cx="50%" cy="70%" r="60%">
+            <stop offset="0%" stop-color="#1e2f5a" stop-opacity="0.7"/>
+            <stop offset="100%" stop-color="#0d0f14" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="skinGrad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="#fcd4a0"/>
+            <stop offset="100%" stop-color="#f0965a"/>
+          </radialGradient>
+        </defs>
+
+        <!-- ambient glow -->
+        <ellipse cx="100" cy="220" rx="90" ry="55" fill="url(#bgGlow)"/>
+
+        <!-- neck -->
+        <rect x="84" y="163" width="32" height="42" fill="url(#skinGrad)"/>
+
+        <!-- shirt body -->
+        <rect x="8" y="196" width="184" height="64" rx="18" fill="#2548b8"/>
+
+        <!-- shirt sheen -->
+        <rect x="8" y="196" width="184" height="16" rx="14" fill="#3460d8"/>
+
+        <!-- white collar V -->
+        <path d="M84 168 L72 215 L100 226 L128 215 L116 168 L100 194 Z" fill="#f0f4ff"/>
+
+        <!-- shirt covering lower collar -->
+        <rect x="8" y="213" width="184" height="47" rx="6" fill="#2548b8"/>
+
+        <!-- tie -->
+        <path d="M100 190 L96 214 L100 222 L104 214 Z" fill="#f5a623"/>
+        <path d="M97 190 L100 182 L103 190 Z" fill="#e8961a"/>
+
+        <!-- head -->
+        <ellipse cx="100" cy="91" rx="68" ry="76" fill="url(#skinGrad)"/>
+
+        <!-- ears -->
+        <ellipse cx="32" cy="96" rx="10" ry="15" fill="url(#skinGrad)"/>
+        <ellipse cx="168" cy="96" rx="10" ry="15" fill="url(#skinGrad)"/>
+        <ellipse cx="32" cy="96" rx="5.5" ry="9" fill="#e08060"/>
+        <ellipse cx="168" cy="96" rx="5.5" ry="9" fill="#e08060"/>
+
+        <!-- hair -->
+        <ellipse cx="100" cy="24" rx="68" ry="36" fill="#1a0d06"/>
+        <rect x="32" y="24" width="136" height="26" fill="#1a0d06"/>
+        <!-- hair highlight -->
+        <ellipse cx="78" cy="19" rx="14" ry="8" fill="#2e1710" opacity="0.55"/>
+
+        <!-- eyebrows (thick, expressive) -->
+        <path id="brow-l" d="M57 74 Q73 63 89 74" stroke="#1a0d06" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+        <path id="brow-r" d="M111 74 Q127 63 143 74" stroke="#1a0d06" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+
+        <!-- eye whites -->
+        <ellipse cx="73" cy="89" rx="17" ry="17" fill="white"/>
+        <ellipse cx="127" cy="89" rx="17" ry="17" fill="white"/>
+
+        <!-- pupils -->
+        <ellipse id="eye-l" cx="73" cy="91" rx="11" ry="11" fill="#1a0d06"/>
+        <ellipse id="eye-r" cx="127" cy="91" rx="11" ry="11" fill="#1a0d06"/>
+
+        <!-- eye shine (primary) -->
+        <circle cx="67" cy="84" r="4.5" fill="white"/>
+        <circle cx="121" cy="84" r="4.5" fill="white"/>
+        <!-- eye shine (secondary) -->
+        <circle cx="80" cy="96" r="2" fill="white" opacity="0.45"/>
+        <circle cx="134" cy="96" r="2" fill="white" opacity="0.45"/>
+
+        <!-- nose -->
+        <ellipse cx="99" cy="113" rx="6" ry="5.5" fill="#e08060"/>
+        <ellipse cx="96" cy="113" rx="2.5" ry="2" fill="#c4643a" opacity="0.7"/>
+        <ellipse cx="102" cy="113" rx="2.5" ry="2" fill="#c4643a" opacity="0.7"/>
+
+        <!-- cheek blush -->
+        <ellipse cx="50" cy="108" rx="19" ry="12" fill="#ff8080" opacity="0.1"/>
+        <ellipse cx="150" cy="108" rx="19" ry="12" fill="#ff8080" opacity="0.1"/>
+
+        <!-- mustache -->
+        <path d="M70 123 Q84 115 100 120 Q116 115 130 123" stroke="#1a0d06" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+
+        <!-- mouth -->
+        <path id="mouth" d="M73 134 Q100 155 127 134" stroke="#c06840" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div id="rogelio-mood" class="mood-text">Your English conversation partner · Ready to chat</div>
+    <div id="status-text" class="status-text"></div>
+
+    <button class="mic-big" id="mic-btn" onclick="toggleMic()">
+      <div class="status-dot" id="status-dot"></div>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="6" height="11" rx="3"/>
+        <path d="M5 10a7 7 0 0014 0"/>
+        <line x1="12" y1="19" x2="12" y2="22"/>
+        <line x1="8"  y1="22" x2="16" y2="22"/>
+      </svg>
+    </button>
+
+    <div class="input-area">
+      <div class="chips">
+        <button class="chip" onclick="chip('I don\'t know how to say ')">Don't know a word</button>
+        <button class="chip" onclick="chip('Can you say that again? ')">Repeat please</button>
+        <button class="chip" onclick="chip('Today I ')">Today I...</button>
+        <button class="chip" onclick="chip('I think that ')">I think that...</button>
+      </div>
+      <div class="input-row">
+        <textarea id="msg" placeholder="Write in English... or use the mic" rows="1"
+          onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
+        <button class="btn-send" onclick="send()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="hint" id="hint"></div>
     </div>
   </div>
 
-  <div id="feedback">
-    <div class="fb-header">
-      <h2>Live feedback</h2>
-      <p>Updates after each message</p>
+  <!-- ══════════ RIGHT PANEL ══════════ -->
+  <div class="right-panel">
+    <div class="chat-header">
+      <span class="chat-title">Conversation</span>
+      <div class="score-mini">
+        <span id="score-num">—</span>
+        <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+      </div>
     </div>
-    <div id="fb-body">
-      <p class="fb-empty">Start talking to Rogelio and your corrections will appear here.</p>
-    </div>
-    <div class="score-area">
-      <div class="score-top"><span>Session score</span><span id="score-num">—</span></div>
-      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+    <div id="chat">
+      <div class="msg-rogelio">
+        <div class="msg-label">Rogelio</div>
+        <div class="msg-text">Hey! Good to see you. So — what's going on? Tell me something interesting.</div>
+        <div class="msg-fb"></div>
+      </div>
     </div>
   </div>
 
-  <div id="input-area">
-    <div class="chips">
-      <button class="chip" onclick="chip(\"I don't know how to say \")">Don't know a word</button>
-      <button class="chip" onclick="chip('Can you say that again? ')">Repeat please</button>
-      <button class="chip" onclick="chip('Today I ')">Today I...</button>
-      <button class="chip" onclick="chip('I think that ')">I think that...</button>
-    </div>
-    <div class="input-row">
-      <button class="btn" id="mic-btn" onclick="toggleMic()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="2" width="6" height="11" rx="3"/>
-          <path d="M5 10a7 7 0 0014 0"/>
-          <line x1="12" y1="19" x2="12" y2="22"/>
-          <line x1="8" y1="22" x2="16" y2="22"/>
-        </svg>
-      </button>
-      <textarea id="msg" placeholder="Write in English... or use the mic" rows="1"
-        onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
-      <button class="btn send" onclick="send()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-      </button>
-    </div>
-    <div class="hint" id="hint"></div>
-  </div>
 </div>
 
 <script>
 const TOPICS = {
-  casual: "Talk about everyday life: daily routine, food, weekend, family, friends, hobbies. Keep it light and natural.",
-  work: "Talk about work, career, tasks, goals, colleagues. Use office-casual language.",
-  story: "Create a fun roleplay scenario (job interview in Chicago, ordering at a NY deli, meeting a new client). Keep it low-pressure and funny.",
+  casual:  "Talk about everyday life: daily routine, food, weekend, family, friends, hobbies. Keep it light and natural.",
+  work:    "Talk about work, career, tasks, goals, colleagues. Use office-casual language.",
+  story:   "Create a fun roleplay scenario (job interview in Chicago, ordering at a NY deli, meeting a new client). Keep it low-pressure and funny.",
   finance: "Talk about economics, markets, investing, commodities, career in finance. Use conversational language, introduce useful vocabulary naturally."
 };
 
@@ -312,7 +396,7 @@ GOOD:[one thing they did well]
 FIX:[main correction as: WRONG → RIGHT: brief reason. Write "Perfect!" if nothing to fix.]
 VOCAB:[one useful word/phrase: WORD — definition and short example]
 SCORE:[1-10 integer]
-MOOD:[one word describing how Rogelio feels about their English right now: proud / confused / impressed / disappointed / amused / shocked]
+MOOD:[one word: proud / confused / impressed / disappointed / amused / shocked]
 FB>>>
 
 4. If they write in Spanish, reply in English, note it gently, show them how to say it in English.
@@ -329,18 +413,26 @@ function parse(text) {
   return { reply, fb: { good: get('GOOD'), fix: get('FIX'), vocab: get('VOCAB'), score: parseInt(get('SCORE'))||null, mood: get('MOOD') } };
 }
 
+/* ── Expression system ── */
 function setMood(mood) {
   const el = document.getElementById('rogelio-mood');
   const moods = {
-    proud: "😄 Rogelio is proud of you!",
-    confused: "😕 Rogelio is a bit confused...",
-    impressed: "🤩 Rogelio is impressed!",
-    disappointed: "😒 Rogelio expected better...",
-    amused: "😄 Rogelio finds this amusing",
-    shocked: "😱 Rogelio is shocked"
+    proud:       "Rogelio is proud of you!",
+    confused:    "Rogelio is a bit confused...",
+    impressed:   "Rogelio is impressed!",
+    disappointed:"Rogelio expected better...",
+    amused:      "Rogelio finds this amusing",
+    shocked:     "Rogelio is shocked"
   };
   el.textContent = moods[mood] || "Your English conversation partner";
   animateExpression(mood);
+}
+
+function triggerAvatarAnim(cls) {
+  const svg = document.getElementById('rogelio-svg');
+  svg.classList.remove('avatar-shake', 'avatar-bounce');
+  void svg.offsetWidth; // force reflow to re-trigger
+  if (cls) svg.classList.add(cls);
 }
 
 function animateExpression(mood) {
@@ -350,148 +442,221 @@ function animateExpression(mood) {
   const eyeL  = document.getElementById('eye-l');
   const eyeR  = document.getElementById('eye-r');
 
-  // reset
-  browL.setAttribute('d','M18.5 17.5 Q21 16.5 23.5 17.5');
-  browR.setAttribute('d','M28.5 17.5 Q31 16.5 33.5 17.5');
-  eyeL.setAttribute('ry','2.5'); eyeR.setAttribute('ry','2.5');
+  // Reset to neutral
+  browL.setAttribute('d', 'M57 74 Q73 63 89 74');
+  browR.setAttribute('d', 'M111 74 Q127 63 143 74');
+  eyeL.setAttribute('ry', '11'); eyeR.setAttribute('ry', '11');
+  eyeL.setAttribute('cx', '73'); eyeR.setAttribute('cx', '127');
 
-  if (mood === 'proud' || mood === 'impressed') {
-    mouth.setAttribute('d','M22 28 Q26 33 30 28');
-    browL.setAttribute('d','M18.5 16.5 Q21 15 23.5 16.5');
-    browR.setAttribute('d','M28.5 16.5 Q31 15 33.5 16.5');
+  if (mood === 'impressed' || mood === 'proud' || mood === 'shocked') {
+    // Brows high, eyes wide, big smile
+    browL.setAttribute('d', 'M57 66 Q73 54 89 66');
+    browR.setAttribute('d', 'M111 66 Q127 54 143 66');
+    mouth.setAttribute('d', 'M70 130 Q100 162 130 130');
+    eyeL.setAttribute('ry', '14'); eyeR.setAttribute('ry', '14');
+
   } else if (mood === 'disappointed') {
-    mouth.setAttribute('d','M22 31 Q26 28 30 31');
-    browL.setAttribute('d','M18.5 18.5 Q21 17.5 23.5 18.5');
-    browR.setAttribute('d','M28.5 18.5 Q31 17.5 33.5 18.5');
-  } else if (mood === 'confused') {
-    mouth.setAttribute('d','M22 30 Q26 29 30 30');
-    browL.setAttribute('d','M18.5 17 Q21 18 23.5 17');
-    browR.setAttribute('d','M28.5 16.5 Q31 15 33.5 16.5');
-  } else if (mood === 'shocked') {
-    mouth.setAttribute('d','M23 29 Q26 34 29 29');
-    eyeL.setAttribute('ry','3.2'); eyeR.setAttribute('ry','3.2');
+    // Inner brow corners up (worried), frown, head shake
+    browL.setAttribute('d', 'M57 78 Q73 70 89 64');
+    browR.setAttribute('d', 'M111 64 Q127 70 143 78');
+    mouth.setAttribute('d', 'M73 148 Q100 134 127 148');
+    triggerAvatarAnim('avatar-shake');
+
   } else if (mood === 'amused') {
-    mouth.setAttribute('d','M21 29 Q26 34 31 29');
+    // Squinting eyes, huge grin, shoulder bounce
+    eyeL.setAttribute('ry', '5'); eyeR.setAttribute('ry', '5');
+    browL.setAttribute('d', 'M57 71 Q73 62 89 71');
+    browR.setAttribute('d', 'M111 71 Q127 62 143 71');
+    mouth.setAttribute('d', 'M62 128 Q100 168 138 128');
+    triggerAvatarAnim('avatar-bounce');
+
+  } else if (mood === 'confused') {
+    // Asymmetric brows, twisted mouth
+    browL.setAttribute('d', 'M57 66 Q73 55 89 68');
+    browR.setAttribute('d', 'M111 76 Q127 68 143 72');
+    mouth.setAttribute('d', 'M73 140 Q92 128 100 136 Q108 144 127 132');
+
   } else {
-    mouth.setAttribute('d','M22 29 Q26 32 30 29');
+    // neutral
+    mouth.setAttribute('d', 'M73 134 Q100 155 127 134');
   }
 }
 
 function animMouth(on) {
   const m = document.getElementById('mouth');
   clearInterval(mouthTimer);
-  if (!on) return;
+  if (!on) {
+    m.setAttribute('d', 'M73 134 Q100 155 127 134');
+    return;
+  }
   let open = true;
   mouthTimer = setInterval(() => {
-    m.setAttribute('d', open ? 'M22 28 Q26 34 30 28' : 'M22 29 Q26 31 30 29');
+    m.setAttribute('d', open
+      ? 'M73 131 Q100 162 127 131'
+      : 'M73 134 Q100 150 127 134');
     open = !open;
-  }, 180);
+  }, 170);
 }
 
-function setStatus(s) { document.getElementById('status-dot').className = 'status-dot ' + (s||''); }
+function setStatus(s) {
+  const dot  = document.getElementById('status-dot');
+  const txt  = document.getElementById('status-text');
+  dot.className = 'status-dot ' + (s || '');
+  if      (s === 'listening') txt.textContent = 'Listening...';
+  else if (s === 'speaking')  txt.textContent = 'Speaking...';
+  else                        txt.textContent = '';
+}
 
+/* ── TTS ── */
 function speak(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   const voices = speechSynthesis.getVoices();
-  u.voice = voices.find(v=>v.lang==='en-US'&&v.name.toLowerCase().includes('male'))
-    || voices.find(v=>v.lang==='en-US')
-    || voices.find(v=>v.lang.startsWith('en')) || null;
+  u.voice = voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('male'))
+    || voices.find(v => v.lang === 'en-US')
+    || voices.find(v => v.lang.startsWith('en'))
+    || null;
   u.rate = 0.88; u.pitch = 0.9;
   u.onstart = () => { setStatus('speaking'); animMouth(true); };
   u.onend   = () => { setStatus(''); animMouth(false); };
   speechSynthesis.speak(u);
 }
-if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = ()=>{};
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = () => {};
 
+/* ── Chat DOM ── */
 function addBubble(role, html) {
   const chat = document.getElementById('chat');
   const w = document.createElement('div');
-  w.className = `bubble-wrap ${role}`;
   if (role === 'system') {
-    w.innerHTML = `<div class="bubble system">${html}</div>`;
+    w.innerHTML = `<div class="msg-system">${html}</div>`;
   } else if (role === 'rogelio') {
-    w.innerHTML = `<div class="bav">R</div><div class="bubble rogelio">${html}</div>`;
+    w.className = 'msg-rogelio';
+    w.innerHTML = `<div class="msg-label">Rogelio</div><div class="msg-text">${html}</div><div class="msg-fb"></div>`;
   } else {
-    w.innerHTML = `<div class="bubble user">${html}</div>`;
+    w.className = 'msg-user';
+    w.innerHTML = `<div class="msg-label">You</div><div class="msg-text">${html}</div>`;
   }
   chat.appendChild(w);
   chat.scrollTop = chat.scrollHeight;
   return w;
 }
 
+/* ── Feedback inline ── */
 function showFeedback(fb) {
-  const body = document.getElementById('fb-body');
+  const fbDivs = document.querySelectorAll('.msg-fb');
+  const fbDiv  = fbDivs[fbDivs.length - 1];
+  if (!fbDiv) return;
+
   let html = '';
-  if (fb.good) html += `<div class="fb-card"><div class="fb-tag good">✓ What worked</div><div class="fb-text">${fb.good}</div></div>`;
-  if (fb.fix && fb.fix !== 'Perfect!') {
-    const p = fb.fix.split('→');
-    const fixed = p.length > 1 ? `<del>${p[0].trim()}</del> → <strong>${p.slice(1).join('→').trim()}</strong>` : fb.fix;
-    html += `<div class="fb-card"><div class="fb-tag fix">↗ Fix this</div><div class="fb-text">${fixed}</div></div>`;
-  } else {
-    html += `<div class="fb-card"><div class="fb-tag good">✓ Grammar</div><div class="fb-text">Nothing to fix!</div></div>`;
+  if (fb.good) html += `<span class="fbi fbi-good">✓ ${fb.good}</span>`;
+  if (fb.fix) {
+    if (fb.fix === 'Perfect!') {
+      html += `<span class="fbi fbi-good">✓ Grammar perfect!</span>`;
+    } else {
+      const arrow = fb.fix.indexOf('→');
+      if (arrow > -1) {
+        const wrong = fb.fix.slice(0, arrow).trim();
+        const right = fb.fix.slice(arrow + 1).trim();
+        html += `<span class="fbi fbi-fix">↗ <del>${wrong}</del> → <strong>${right}</strong></span>`;
+      } else {
+        html += `<span class="fbi fbi-fix">↗ ${fb.fix}</span>`;
+      }
+    }
   }
-  if (fb.vocab) html += `<div class="fb-card"><div class="fb-tag vocab">💡 New phrase</div><div class="fb-text">${fb.vocab}</div></div>`;
-  body.innerHTML = html;
+  if (fb.vocab) html += `<span class="fbi fbi-vocab">💡 ${fb.vocab}</span>`;
+  fbDiv.innerHTML = html;
+
   if (fb.score) {
     scores.push(fb.score);
-    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
-    document.getElementById('score-fill').style.width = (avg*10)+'%';
+    const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+    document.getElementById('score-fill').style.width = (avg * 10) + '%';
     document.getElementById('score-num').textContent = `${avg}/10`;
   }
   if (fb.mood) setMood(fb.mood);
 }
 
+/* ── Send ── */
 async function send() {
   const ta = document.getElementById('msg');
   const text = ta.value.trim();
   if (!text) return;
   ta.value = ''; ta.style.height = '';
   addBubble('user', text);
-  history.push({ role:'user', content: text });
+  history.push({ role: 'user', content: text });
   const tw = addBubble('rogelio', '<span class="typing"><span></span><span></span><span></span></span>');
   try {
     const res = await fetch('/api/chat', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: history, system: systemPrompt() })
     });
     const data = await res.json();
     const { reply, fb } = parse(data.text);
-    tw.querySelector('.bubble.rogelio').textContent = reply;
-    history.push({ role:'assistant', content: data.text });
+    tw.querySelector('.msg-text').textContent = reply;
+    history.push({ role: 'assistant', content: data.text });
     if (fb) showFeedback(fb);
     speak(reply);
   } catch(e) {
-    tw.querySelector('.bubble.rogelio').textContent = 'Connection error. Try again.';
+    tw.querySelector('.msg-text').textContent = 'Connection error. Try again.';
   }
 }
 
+/* ── Topics ── */
 function setTopic(t, btn) {
   topic = t; history = [];
-  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  addBubble('system', `Topic: ${t}`);
-  const msgs = { casual:"Alright! So what's been going on with you lately?", work:"Nice! So what kind of work do you do?", story:"Okay! Imagine you just walked into a job interview in Chicago. The interviewer says: \"Tell me about yourself.\" — Go!", finance:"Interesting! Are you more into investing, or macro economics?" };
-  setTimeout(()=>{ addBubble('rogelio', msgs[t]); speak(msgs[t]); }, 150);
+  addBubble('system', `Topic switched to: ${t}`);
+  const msgs = {
+    casual:  "Alright! So what's been going on with you lately?",
+    work:    "Nice! So what kind of work do you do?",
+    story:   "Okay! Imagine you just walked into a job interview in Chicago. The interviewer says: \"Tell me about yourself.\" — Go!",
+    finance: "Interesting! Are you more into investing, or macro economics?"
+  };
+  setTimeout(() => { addBubble('rogelio', msgs[t]); speak(msgs[t]); }, 150);
 }
 
-function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
-function grow(el) { el.style.height=''; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
-function chip(t) { const ta=document.getElementById('msg'); ta.value=t; ta.focus(); grow(ta); }
-function setHint(m) { document.getElementById('hint').textContent=m; }
+/* ── Utils ── */
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+function grow(el) { el.style.height = ''; el.style.height = Math.min(el.scrollHeight, 80) + 'px'; }
+function chip(t) { const ta = document.getElementById('msg'); ta.value = t; ta.focus(); grow(ta); }
+function setHint(m) { document.getElementById('hint').textContent = m; }
 
+/* ── Mic ── */
 function toggleMic() {
-  if (!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)) { setHint('Use Chrome or Edge for mic support'); return; }
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    setHint('Use Chrome or Edge for mic support'); return;
+  }
   if (listening) { recognition.stop(); return; }
-  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.lang='en-US'; recognition.interimResults=true;
-  recognition.onstart=()=>{ listening=true; document.getElementById('mic-btn').classList.add('mic-on'); setStatus('listening'); speechSynthesis.cancel(); setHint('Listening... speak now'); };
-  recognition.onresult=e=>{ const t=Array.from(e.results).map(r=>r[0].transcript).join(''); document.getElementById('msg').value=t; if(e.results[e.results.length-1].isFinal){listening=false;document.getElementById('mic-btn').classList.remove('mic-on');setStatus('');setHint('');send();} };
-  recognition.onerror=()=>{ listening=false; document.getElementById('mic-btn').classList.remove('mic-on'); setStatus(''); setHint('Could not hear you — try again'); };
-  recognition.onend=()=>{ listening=false; document.getElementById('mic-btn').classList.remove('mic-on'); };
+  recognition.lang = 'en-US'; recognition.interimResults = true;
+  recognition.onstart = () => {
+    listening = true;
+    document.getElementById('mic-btn').classList.add('mic-on');
+    setStatus('listening');
+    speechSynthesis.cancel();
+    setHint('Listening... speak now');
+  };
+  recognition.onresult = e => {
+    const t = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('msg').value = t;
+    if (e.results[e.results.length - 1].isFinal) {
+      listening = false;
+      document.getElementById('mic-btn').classList.remove('mic-on');
+      setStatus(''); setHint(''); send();
+    }
+  };
+  recognition.onerror = () => {
+    listening = false;
+    document.getElementById('mic-btn').classList.remove('mic-on');
+    setStatus(''); setHint('Could not hear you — try again');
+  };
+  recognition.onend = () => {
+    listening = false;
+    document.getElementById('mic-btn').classList.remove('mic-on');
+  };
   recognition.start();
 }
 </script>
