@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rogelio — English Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2230;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #eef0f6;
+  --text2: #8b91a8;
+  --text3: #454d66;
+  --accent: #4f7ef8;
+  --green: #34c97a;
+  --amber: #f5a623;
+  --red: #f05252;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+.app { display: grid; grid-template-columns: 1fr 260px; grid-template-rows: auto 1fr auto; height: 100vh; }
+
+header {
+  grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar-wrap svg { width: 52px; height: 52px; }
+.status-dot {
+  position: absolute; bottom: 2px; right: 2px;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--green); border: 2px solid var(--surface);
+  transition: background 0.3s;
+}
+.status-dot.listening { background: var(--amber); animation: blink 0.5s infinite alternate; }
+.status-dot.speaking  { background: var(--accent); animation: blink 0.8s infinite alternate; }
+@keyframes blink { to { opacity: 0.3; } }
+
+.header-info h1 { font-size: 16px; font-weight: 600; }
+.header-info p  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+.topic-pills { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.pill {
+  font-size: 11px; padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+.pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+#chat {
+  grid-column: 1; overflow-y: auto; padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.bubble-wrap { display: flex; gap: 10px; align-items: flex-end; }
+.bubble-wrap.user { flex-direction: row-reverse; }
+
+.bav {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, #2a3a8f, #4f7ef8);
+  flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 600; color: #fff;
+}
+
+.bubble {
+  max-width: 72%; padding: 11px 15px; border-radius: 18px;
+  font-size: 14px; line-height: 1.6;
+}
+.bubble.rogelio {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-bottom-left-radius: 5px; color: var(--text);
+}
+.bubble.user {
+  background: var(--accent); border-bottom-right-radius: 5px; color: #fff;
+}
+.bubble.system {
+  background: none; border: none; color: var(--text3);
+  font-size: 12px; align-self: center; padding: 4px 0;
+}
+
+.typing span {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text3); animation: dot 1.2s infinite; margin: 0 2px;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+#feedback {
+  grid-column: 2; grid-row: 2 / 4;
+  border-left: 1px solid var(--border); background: var(--surface);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.fb-header { padding: 16px; border-bottom: 1px solid var(--border); }
+.fb-header h2 { font-size: 13px; font-weight: 600; }
+.fb-header p  { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+#fb-body {
+  flex: 1; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.fb-empty { color: var(--text3); font-size: 12px; text-align: center; padding: 24px 12px; line-height: 1.7; }
+.fb-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+}
+.fb-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.fb-tag.good  { color: var(--green); }
+.fb-tag.fix   { color: var(--amber); }
+.fb-tag.vocab { color: var(--accent); }
+.fb-tag.mood  { color: var(--red); }
+.fb-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.fb-text strong { color: var(--text); font-weight: 500; }
+.fb-text del { color: var(--text3); text-decoration: line-through; }
+
+.score-area { padding: 12px 16px; border-top: 1px solid var(--border); }
+.score-top { font-size: 11px; color: var(--text3); margin-bottom: 7px; display: flex; justify-content: space-between; }
+.score-track { height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.score-fill  { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: width 0.7s ease; }
+
+#input-area {
+  grid-column: 1; padding: 14px 20px;
+  border-top: 1px solid var(--border); background: var(--surface);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-size: 11px; padding: 5px 12px; border-radius: 20px;
+  border: 1px solid var(--border2); background: transparent;
+  color: var(--text2); cursor: pointer; transition: all 0.15s;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+
+.input-row { display: flex; gap: 10px; align-items: flex-end; }
+textarea {
+  flex: 1; resize: none; background: var(--surface2);
+  border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  color: var(--text); font-family: 'Inter', sans-serif;
+  font-size: 14px; padding: 10px 14px;
+  min-height: 42px; max-height: 100px; line-height: 1.5; outline: none;
+  transition: border 0.2s;
+}
+textarea::placeholder { color: var(--text3); }
+textarea:focus { border-color: var(--accent); }
+
+.btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--surface2);
+  color: var(--text2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.btn:hover { background: var(--surface); color: var(--text); }
+.btn.mic-on { background: var(--red); border-color: var(--red); color: #fff; animation: mpulse 1s infinite; }
+@keyframes mpulse { 0%,100%{box-shadow:0 0 0 0 rgba(240,82,82,0.4)} 50%{box-shadow:0 0 0 8px rgba(240,82,82,0)} }
+.btn.send { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.send:hover { background: #3560d4; }
+
+.hint { font-size: 11px; color: var(--text3); text-align: center; min-height: 14px; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+@media (max-width: 600px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; }
+  #feedback { grid-column: 1; grid-row: 4; border-left: none; border-top: 1px solid var(--border); max-height: 180px; }
+  .topic-pills { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="avatar-wrap">
+      <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" id="rogelio-svg">
+        <circle cx="26" cy="26" r="26" fill="#1e2230"/>
+        <circle cx="26" cy="26" r="26" fill="url(#bg-grad)"/>
+        <defs>
+          <radialGradient id="bg-grad" cx="50%" cy="30%">
+            <stop offset="0%" stop-color="#2a3a8f"/>
+            <stop offset="100%" stop-color="#0d1230"/>
+          </radialGradient>
+        </defs>
+        <!-- head -->
+        <ellipse cx="26" cy="22" rx="11" ry="12" fill="#f4c99a"/>
+        <!-- hair -->
+        <ellipse cx="26" cy="12" rx="11" ry="6" fill="#2c1a0e"/>
+        <rect x="15" y="12" width="22" height="5" fill="#2c1a0e"/>
+        <!-- ears -->
+        <ellipse cx="15" cy="22" rx="2.5" ry="3" fill="#f4c99a"/>
+        <ellipse cx="37" cy="22" rx="2.5" ry="3" fill="#f4c99a"/>
+        <!-- eyes -->
+        <ellipse id="eye-l" cx="21" cy="21" rx="2.5" ry="2.5" fill="#2c1a0e"/>
+        <ellipse id="eye-r" cx="31" cy="21" rx="2.5" ry="2.5" fill="#2c1a0e"/>
+        <circle cx="22" cy="20.5" r="0.8" fill="white"/>
+        <circle cx="32" cy="20.5" r="0.8" fill="white"/>
+        <!-- eyebrows -->
+        <path id="brow-l" d="M18.5 17.5 Q21 16.5 23.5 17.5" stroke="#2c1a0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path id="brow-r" d="M28.5 17.5 Q31 16.5 33.5 17.5" stroke="#2c1a0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- nose -->
+        <ellipse cx="26" cy="25" rx="1.5" ry="1" fill="#e8a87c"/>
+        <!-- mouth -->
+        <path id="mouth" d="M22 29 Q26 32 30 29" stroke="#c0734a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- mustache -->
+        <path d="M22 27.5 Q24 26.5 26 27 Q28 26.5 30 27.5" stroke="#2c1a0e" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <!-- body / shirt -->
+        <ellipse cx="26" cy="46" rx="14" ry="10" fill="#4f7ef8"/>
+        <rect x="12" y="38" width="28" height="14" fill="#4f7ef8" rx="4"/>
+        <!-- collar -->
+        <path d="M22 34 L26 40 L30 34" stroke="white" stroke-width="1.5" fill="none"/>
+        <!-- tie -->
+        <path d="M26 36 L24.5 42 L26 44 L27.5 42 Z" fill="#f5a623"/>
+      </svg>
+      <div class="status-dot" id="status-dot"></div>
+    </div>
+    <div class="header-info">
+      <h1>Rogelio</h1>
+      <p id="rogelio-mood">Your English conversation partner · Ready to chat</p>
+    </div>
+    <div class="topic-pills">
+      <button class="pill active" onclick="setTopic('casual',this)">Casual</button>
+      <button class="pill" onclick="setTopic('work',this)">Work</button>
+      <button class="pill" onclick="setTopic('story',this)">Story</button>
+      <button class="pill" onclick="setTopic('finance',this)">Finance</button>
+    </div>
+  </header>
+
+  <div id="chat">
+    <div class="bubble-wrap">
+      <div class="bav">R</div>
+      <div class="bubble rogelio">Hey! Good to see you. So — what's going on? Tell me something interesting.</div>
+    </div>
+  </div>
+
+  <div id="feedback">
+    <div class="fb-header">
+      <h2>Live feedback</h2>
+      <p>Updates after each message</p>
+    </div>
+    <div id="fb-body">
+      <p class="fb-empty">Start talking to Rogelio and your corrections will appear here.</p>
+    </div>
+    <div class="score-area">
+      <div class="score-top"><span>Session score</span><span id="score-num">—</span></div>
+      <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+    </div>
+  </div>
+
+  <div id="input-area">
+    <div class="chips">
+      <button class="chip" onclick="chip(\"I don't know how to say \")">Don't know a word</button>
+      <button class="chip" onclick="chip('Can you say that again? ')">Repeat please</button>
+      <button class="chip" onclick="chip('Today I ')">Today I...</button>
+      <button class="chip" onclick="chip('I think that ')">I think that...</button>
+    </div>
+    <div class="input-row">
+      <button class="btn" id="mic-btn" onclick="toggleMic()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2" width="6" height="11" rx="3"/>
+          <path d="M5 10a7 7 0 0014 0"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+      </button>
+      <textarea id="msg" placeholder="Write in English... or use the mic" rows="1"
+        onkeydown="handleKey(event)" oninput="grow(this)"></textarea>
+      <button class="btn send" onclick="send()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+
+<script>
+const TOPICS = {
+  casual: "Talk about everyday life: daily routine, food, weekend, family, friends, hobbies. Keep it light and natural.",
+  work: "Talk about work, career, tasks, goals, colleagues. Use office-casual language.",
+  story: "Create a fun roleplay scenario (job interview in Chicago, ordering at a NY deli, meeting a new client). Keep it low-pressure and funny.",
+  finance: "Talk about economics, markets, investing, commodities, career in finance. Use conversational language, introduce useful vocabulary naturally."
+};
+
+let history = [], topic = "casual", scores = [], listening = false, mouthTimer = null, recognition = null;
+
+function systemPrompt() {
+  return `You are Rogelio, a funny, direct, slightly sarcastic but warm male English-speaking colleague in his 30s. You help a beginner Argentine Spanish speaker practice natural conversational English. They know basics but make grammar mistakes.
+
+Topic: ${TOPICS[topic]}
+
+RULES:
+1. Reply naturally in 2-3 sentences max. Use casual connectors: "you know", "I mean", "honestly", "kind of", "to be fair".
+2. Show personality — make jokes, tease them gently when they make mistakes, be encouraging but real.
+3. After every reply add this block EXACTLY:
+
+<<<FB
+GOOD:[one thing they did well]
+FIX:[main correction as: WRONG → RIGHT: brief reason. Write "Perfect!" if nothing to fix.]
+VOCAB:[one useful word/phrase: WORD — definition and short example]
+SCORE:[1-10 integer]
+MOOD:[one word describing how Rogelio feels about their English right now: proud / confused / impressed / disappointed / amused / shocked]
+FB>>>
+
+4. If they write in Spanish, reply in English, note it gently, show them how to say it in English.
+5. If they say "I don't know how to say", help them find the expression.
+6. Never break character. You are Rogelio, not an AI.`;
+}
+
+function parse(text) {
+  const m = text.match(/<<<FB([\s\S]*?)FB>>>/);
+  if (!m) return { reply: text, fb: null };
+  const raw = m[1];
+  const reply = text.replace(/<<<FB[\s\S]*?FB>>>/, '').trim();
+  const get = k => { const r = raw.match(new RegExp(`${k}:(.+)`)); return r ? r[1].trim() : null; };
+  return { reply, fb: { good: get('GOOD'), fix: get('FIX'), vocab: get('VOCAB'), score: parseInt(get('SCORE'))||null, mood: get('MOOD') } };
+}
+
+function setMood(mood) {
+  const el = document.getElementById('rogelio-mood');
+  const moods = {
+    proud: "😄 Rogelio is proud of you!",
+    confused: "😕 Rogelio is a bit confused...",
+    impressed: "🤩 Rogelio is impressed!",
+    disappointed: "😒 Rogelio expected better...",
+    amused: "😄 Rogelio finds this amusing",
+    shocked: "😱 Rogelio is shocked"
+  };
+  el.textContent = moods[mood] || "Your English conversation partner";
+  animateExpression(mood);
+}
+
+function animateExpression(mood) {
+  const browL = document.getElementById('brow-l');
+  const browR = document.getElementById('brow-r');
+  const mouth = document.getElementById('mouth');
+  const eyeL  = document.getElementById('eye-l');
+  const eyeR  = document.getElementById('eye-r');
+
+  // reset
+  browL.setAttribute('d','M18.5 17.5 Q21 16.5 23.5 17.5');
+  browR.setAttribute('d','M28.5 17.5 Q31 16.5 33.5 17.5');
+  eyeL.setAttribute('ry','2.5'); eyeR.setAttribute('ry','2.5');
+
+  if (mood === 'proud' || mood === 'impressed') {
+    mouth.setAttribute('d','M22 28 Q26 33 30 28');
+    browL.setAttribute('d','M18.5 16.5 Q21 15 23.5 16.5');
+    browR.setAttribute('d','M28.5 16.5 Q31 15 33.5 16.5');
+  } else if (mood === 'disappointed') {
+    mouth.setAttribute('d','M22 31 Q26 28 30 31');
+    browL.setAttribute('d','M18.5 18.5 Q21 17.5 23.5 18.5');
+    browR.setAttribute('d','M28.5 18.5 Q31 17.5 33.5 18.5');
+  } else if (mood === 'confused') {
+    mouth.setAttribute('d','M22 30 Q26 29 30 30');
+    browL.setAttribute('d','M18.5 17 Q21 18 23.5 17');
+    browR.setAttribute('d','M28.5 16.5 Q31 15 33.5 16.5');
+  } else if (mood === 'shocked') {
+    mouth.setAttribute('d','M23 29 Q26 34 29 29');
+    eyeL.setAttribute('ry','3.2'); eyeR.setAttribute('ry','3.2');
+  } else if (mood === 'amused') {
+    mouth.setAttribute('d','M21 29 Q26 34 31 29');
+  } else {
+    mouth.setAttribute('d','M22 29 Q26 32 30 29');
+  }
+}
+
+function animMouth(on) {
+  const m = document.getElementById('mouth');
+  clearInterval(mouthTimer);
+  if (!on) return;
+  let open = true;
+  mouthTimer = setInterval(() => {
+    m.setAttribute('d', open ? 'M22 28 Q26 34 30 28' : 'M22 29 Q26 31 30 29');
+    open = !open;
+  }, 180);
+}
+
+function setStatus(s) { document.getElementById('status-dot').className = 'status-dot ' + (s||''); }
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  const voices = speechSynthesis.getVoices();
+  u.voice = voices.find(v=>v.lang==='en-US'&&v.name.toLowerCase().includes('male'))
+    || voices.find(v=>v.lang==='en-US')
+    || voices.find(v=>v.lang.startsWith('en')) || null;
+  u.rate = 0.88; u.pitch = 0.9;
+  u.onstart = () => { setStatus('speaking'); animMouth(true); };
+  u.onend   = () => { setStatus(''); animMouth(false); };
+  speechSynthesis.speak(u);
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = ()=>{};
+
+function addBubble(role, html) {
+  const chat = document.getElementById('chat');
+  const w = document.createElement('div');
+  w.className = `bubble-wrap ${role}`;
+  if (role === 'system') {
+    w.innerHTML = `<div class="bubble system">${html}</div>`;
+  } else if (role === 'rogelio') {
+    w.innerHTML = `<div class="bav">R</div><div class="bubble rogelio">${html}</div>`;
+  } else {
+    w.innerHTML = `<div class="bubble user">${html}</div>`;
+  }
+  chat.appendChild(w);
+  chat.scrollTop = chat.scrollHeight;
+  return w;
+}
+
+function showFeedback(fb) {
+  const body = document.getElementById('fb-body');
+  let html = '';
+  if (fb.good) html += `<div class="fb-card"><div class="fb-tag good">✓ What worked</div><div class="fb-text">${fb.good}</div></div>`;
+  if (fb.fix && fb.fix !== 'Perfect!') {
+    const p = fb.fix.split('→');
+    const fixed = p.length > 1 ? `<del>${p[0].trim()}</del> → <strong>${p.slice(1).join('→').trim()}</strong>` : fb.fix;
+    html += `<div class="fb-card"><div class="fb-tag fix">↗ Fix this</div><div class="fb-text">${fixed}</div></div>`;
+  } else {
+    html += `<div class="fb-card"><div class="fb-tag good">✓ Grammar</div><div class="fb-text">Nothing to fix!</div></div>`;
+  }
+  if (fb.vocab) html += `<div class="fb-card"><div class="fb-tag vocab">💡 New phrase</div><div class="fb-text">${fb.vocab}</div></div>`;
+  body.innerHTML = html;
+  if (fb.score) {
+    scores.push(fb.score);
+    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    document.getElementById('score-fill').style.width = (avg*10)+'%';
+    document.getElementById('score-num').textContent = `${avg}/10`;
+  }
+  if (fb.mood) setMood(fb.mood);
+}
+
+async function send() {
+  const ta = document.getElementById('msg');
+  const text = ta.value.trim();
+  if (!text) return;
+  ta.value = ''; ta.style.height = '';
+  addBubble('user', text);
+  history.push({ role:'user', content: text });
+  const tw = addBubble('rogelio', '<span class="typing"><span></span><span></span><span></span></span>');
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ messages: history, system: systemPrompt() })
+    });
+    const data = await res.json();
+    const { reply, fb } = parse(data.text);
+    tw.querySelector('.bubble.rogelio').textContent = reply;
+    history.push({ role:'assistant', content: data.text });
+    if (fb) showFeedback(fb);
+    speak(reply);
+  } catch(e) {
+    tw.querySelector('.bubble.rogelio').textContent = 'Connection error. Try again.';
+  }
+}
+
+function setTopic(t, btn) {
+  topic = t; history = [];
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  addBubble('system', `Topic: ${t}`);
+  const msgs = { casual:"Alright! So what's been going on with you lately?", work:"Nice! So what kind of work do you do?", story:"Okay! Imagine you just walked into a job interview in Chicago. The interviewer says: \"Tell me about yourself.\" — Go!", finance:"Interesting! Are you more into investing, or macro economics?" };
+  setTimeout(()=>{ addBubble('rogelio', msgs[t]); speak(msgs[t]); }, 150);
+}
+
+function handleKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }
+function grow(el) { el.style.height=''; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
+function chip(t) { const ta=document.getElementById('msg'); ta.value=t; ta.focus(); grow(ta); }
+function setHint(m) { document.getElementById('hint').textContent=m; }
+
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)) { setHint('Use Chrome or Edge for mic support'); return; }
+  if (listening) { recognition.stop(); return; }
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang='en-US'; recognition.interimResults=true;
+  recognition.onstart=()=>{ listening=true; document.getElementById('mic-btn').classList.add('mic-on'); setStatus('listening'); speechSynthesis.cancel(); setHint('Listening... speak now'); };
+  recognition.onresult=e=>{ const t=Array.from(e.results).map(r=>r[0].transcript).join(''); document.getElementById('msg').value=t; if(e.results[e.results.length-1].isFinal){listening=false;document.getElementById('mic-btn').classList.remove('mic-on');setStatus('');setHint('');send();} };
+  recognition.onerror=()=>{ listening=false; document.getElementById('mic-btn').classList.remove('mic-on'); setStatus(''); setHint('Could not hear you — try again'); };
+  recognition.onend=()=>{ listening=false; document.getElementById('mic-btn').classList.remove('mic-on'); };
+  recognition.start();
+}
+</script>
+</body>
+</html>
