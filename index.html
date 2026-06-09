@@ -89,9 +89,9 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
   opacity: 0;
   z-index: 1;
 }
-#rogelio-svg.speaking .r-ripple:nth-child(1) { animation: ripple 1.6s ease-out infinite 0.0s; }
-#rogelio-svg.speaking .r-ripple:nth-child(2) { animation: ripple 1.6s ease-out infinite 0.5s; }
-#rogelio-svg.speaking .r-ripple:nth-child(3) { animation: ripple 1.6s ease-out infinite 1.0s; }
+#rogelio-svg.speaking .r-ripple:nth-child(1) { animation: ripple 1.6s ease-out 0.0s infinite; }
+#rogelio-svg.speaking .r-ripple:nth-child(2) { animation: ripple 1.6s ease-out 0.5s infinite; }
+#rogelio-svg.speaking .r-ripple:nth-child(3) { animation: ripple 1.6s ease-out 1.0s infinite; }
 @keyframes ripple {
   0%   { transform: scale(1);   opacity: 0.7; }
   100% { transform: scale(2.1); opacity: 0;   }
@@ -126,14 +126,6 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
   min-height: 18px;
   transition: all 0.3s;
 }
-.status-text {
-  font-size: 11px;
-  color: var(--amber);
-  min-height: 14px;
-  text-align: center;
-  letter-spacing: 0.03em;
-}
-
 /* Big mic button */
 .mic-big {
   width: 68px; height: 68px; border-radius: 50%;
@@ -147,6 +139,7 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
   position: relative;
 }
 .mic-big:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+.mic-big.mic-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
 .mic-big.mic-on {
   background: var(--red); border-color: var(--red); color: #fff;
   animation: micPulse 1s infinite;
@@ -288,7 +281,6 @@ textarea:focus { border-color: var(--accent); }
     </div>
 
     <div id="rogelio-mood" class="mood-text">Your English conversation partner · Ready to chat</div>
-    <div id="status-text" class="status-text"></div>
 
     <button class="mic-big" id="mic-btn" onclick="toggleMic()">
       <div class="status-dot" id="status-dot"></div>
@@ -421,12 +413,7 @@ function animMouth(on) {
 
 function setStatus(s) {
   document.getElementById('status-dot').className = 'status-dot ' + (s || '');
-  const txt = document.getElementById('status-text');
-  if      (s === 'listening') txt.textContent = 'Escuchando...';
-  else if (s === 'speaking')  txt.textContent = 'Hablando...';
-  else                        txt.textContent = '';
-  const svg = document.getElementById('rogelio-svg');
-  svg.classList.toggle('listening', s === 'listening');
+  document.getElementById('rogelio-svg').classList.toggle('listening', s === 'listening');
 }
 
 /* ── Voice selection ── */
@@ -465,11 +452,12 @@ function setVoice(name) {
 function speak(text) {
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
+  const micBtn = document.getElementById('mic-btn');
   const u = new SpeechSynthesisUtterance(text);
   u.voice = pickVoice(speechSynthesis.getVoices());
   u.rate = 0.92; u.pitch = 1.0;
-  u.onstart = () => { setStatus('speaking'); animMouth(true); };
-  u.onend   = () => { setStatus(''); animMouth(false); };
+  u.onstart = () => { setStatus('speaking'); animMouth(true); micBtn.classList.add('mic-disabled'); };
+  u.onend   = () => { setStatus(''); animMouth(false); micBtn.classList.remove('mic-disabled'); };
   speechSynthesis.speak(u);
 }
 populateVoices();
@@ -532,7 +520,8 @@ async function send() {
   const ta = document.getElementById('msg');
   const text = ta.value.trim();
   if (!text) return;
-  ta.value = ''; ta.style.height = '';
+  if (listening && recognition) { recognition.stop(); }
+  ta.value = ''; ta.style.height = ''; finalTranscript = '';
   addBubble('user', text);
   history.push({ role: 'user', content: text });
   const tw = addBubble('rogelio', '<span class="typing"><span></span><span></span><span></span></span>');
