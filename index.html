@@ -242,95 +242,115 @@ textarea:focus { border-color: var(--accent); }
     </div>
 
     <div class="avatar-stage">
-      <!-- ViewBox 200×260 — big expressive caricature -->
       <svg id="rogelio-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="bgGlow" cx="50%" cy="70%" r="60%">
-            <stop offset="0%" stop-color="#1e2f5a" stop-opacity="0.7"/>
+            <stop offset="0%" stop-color="#1e2f5a" stop-opacity="0.6"/>
             <stop offset="100%" stop-color="#0d0f14" stop-opacity="0"/>
           </radialGradient>
-          <radialGradient id="skinGrad" cx="40%" cy="30%">
-            <stop offset="0%" stop-color="#fcd4a0"/>
-            <stop offset="100%" stop-color="#f0965a"/>
+          <!-- skin: morena clara, warm light brown -->
+          <radialGradient id="skinGrad" cx="38%" cy="28%" r="65%">
+            <stop offset="0%" stop-color="#e8a070"/>
+            <stop offset="100%" stop-color="#c07040"/>
+          </radialGradient>
+          <radialGradient id="skinEar" cx="30%" cy="30%">
+            <stop offset="0%" stop-color="#d08050"/>
+            <stop offset="100%" stop-color="#a85e30"/>
+          </radialGradient>
+          <radialGradient id="irisGrad" cx="35%" cy="30%">
+            <stop offset="0%" stop-color="#5a3318"/>
+            <stop offset="100%" stop-color="#2a1208"/>
           </radialGradient>
         </defs>
 
         <!-- ambient glow -->
-        <ellipse cx="100" cy="220" rx="90" ry="55" fill="url(#bgGlow)"/>
+        <ellipse cx="100" cy="225" rx="88" ry="52" fill="url(#bgGlow)"/>
 
         <!-- neck -->
-        <rect x="84" y="163" width="32" height="42" fill="url(#skinGrad)"/>
+        <rect x="83" y="168" width="34" height="36" rx="4" fill="#c07040"/>
 
         <!-- shirt body -->
-        <rect x="8" y="196" width="184" height="64" rx="18" fill="#2548b8"/>
+        <rect x="8" y="196" width="184" height="64" rx="18" fill="#1e40a8"/>
+        <rect x="8" y="196" width="184" height="15" rx="13" fill="#2e56c8"/>
 
-        <!-- shirt sheen -->
-        <rect x="8" y="196" width="184" height="16" rx="14" fill="#3460d8"/>
-
-        <!-- white collar V -->
-        <path d="M84 168 L72 215 L100 226 L128 215 L116 168 L100 194 Z" fill="#f0f4ff"/>
-
-        <!-- shirt covering lower collar -->
-        <rect x="8" y="213" width="184" height="47" rx="6" fill="#2548b8"/>
+        <!-- white collar (V-shape visible above shirt) -->
+        <path d="M84 172 L74 214 L100 226 L126 214 L116 172 L100 196 Z" fill="#eef2ff"/>
+        <rect x="8" y="212" width="184" height="48" rx="6" fill="#1e40a8"/>
 
         <!-- tie -->
-        <path d="M100 190 L96 214 L100 222 L104 214 Z" fill="#f5a623"/>
-        <path d="M97 190 L100 182 L103 190 Z" fill="#e8961a"/>
+        <path d="M100 193 L97 214 L100 222 L103 214 Z" fill="#e8a020"/>
+        <path d="M97 193 L100 185 L103 193 Z" fill="#d09010"/>
 
-        <!-- head -->
-        <ellipse cx="100" cy="91" rx="68" ry="76" fill="url(#skinGrad)"/>
+        <!-- ears (behind face) -->
+        <ellipse cx="33" cy="98" rx="11" ry="16" fill="url(#skinEar)"/>
+        <ellipse cx="167" cy="98" rx="11" ry="16" fill="url(#skinEar)"/>
+        <path d="M33 87 Q38 98 33 109" stroke="#955030" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M167 87 Q162 98 167 109" stroke="#955030" stroke-width="1.5" fill="none" opacity="0.5"/>
 
-        <!-- ears -->
-        <ellipse cx="32" cy="96" rx="10" ry="15" fill="url(#skinGrad)"/>
-        <ellipse cx="168" cy="96" rx="10" ry="15" fill="url(#skinGrad)"/>
-        <ellipse cx="32" cy="96" rx="5.5" ry="9" fill="#e08060"/>
-        <ellipse cx="168" cy="96" rx="5.5" ry="9" fill="#e08060"/>
+        <!-- face — natural oval, wider at cheeks, pointed chin -->
+        <path d="M100 22 C72 22,34 52,34 92 C34 128,56 162,80 172 C88 176,94 178,100 178 C106 178,112 176,120 172 C144 162,166 128,166 92 C166 52,128 22,100 22 Z" fill="url(#skinGrad)"/>
 
-        <!-- hair -->
-        <ellipse cx="100" cy="24" rx="68" ry="36" fill="#1a0d06"/>
-        <rect x="32" y="24" width="136" height="26" fill="#1a0d06"/>
-        <!-- hair highlight -->
-        <ellipse cx="78" cy="19" rx="14" ry="8" fill="#2e1710" opacity="0.55"/>
+        <!-- jaw/chin shadow for depth -->
+        <path d="M62 155 Q100 176 138 155 Q128 172 100 177 Q72 172 62 155 Z" fill="#a86030" opacity="0.18"/>
 
-        <!-- eyebrows (thick, expressive) -->
-        <path id="brow-l" d="M57 74 Q73 63 89 74" stroke="#1a0d06" stroke-width="6.5" fill="none" stroke-linecap="round"/>
-        <path id="brow-r" d="M111 74 Q127 63 143 74" stroke="#1a0d06" stroke-width="6.5" fill="none" stroke-linecap="round"/>
+        <!-- hair — short, modern, organic shape -->
+        <path d="M36 90 C36 52,66 16,100 16 C134 16,164 52,164 90 C162 64,150 32,130 23 Q116 17,100 17 Q84 17,70 23 C50 32,38 64,36 90 Z" fill="#1c0e06"/>
+        <!-- hair highlight (shine on top-left) -->
+        <ellipse cx="82" cy="30" rx="22" ry="10" fill="#2e1a10" opacity="0.45"/>
+        <!-- subtle temple fade -->
+        <path d="M38 78 Q36 88 36 90" stroke="#1c0e06" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+        <path d="M162 78 Q164 88 164 90" stroke="#1c0e06" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
 
-        <!-- eye whites -->
-        <ellipse cx="73" cy="89" rx="17" ry="17" fill="white"/>
-        <ellipse cx="127" cy="89" rx="17" ry="17" fill="white"/>
+        <!-- eyebrows — filled organic shapes, thick and natural -->
+        <path id="brow-l" d="M57 76 C65 69,78 67,93 71 C92 76,78 73,57 80 Z" fill="#1c0e06"/>
+        <path id="brow-r" d="M107 71 C122 67,135 69,143 76 C143 80,122 73,107 76 Z" fill="#1c0e06"/>
 
-        <!-- pupils -->
-        <ellipse id="eye-l" cx="73" cy="91" rx="11" ry="11" fill="#1a0d06"/>
-        <ellipse id="eye-r" cx="127" cy="91" rx="11" ry="11" fill="#1a0d06"/>
+        <!-- eye whites — slightly elliptical, more natural -->
+        <ellipse cx="72" cy="91" rx="16" ry="13" fill="white"/>
+        <ellipse cx="128" cy="91" rx="16" ry="13" fill="white"/>
 
-        <!-- eye shine (primary) -->
-        <circle cx="67" cy="84" r="4.5" fill="white"/>
-        <circle cx="121" cy="84" r="4.5" fill="white"/>
-        <!-- eye shine (secondary) -->
-        <circle cx="80" cy="96" r="2" fill="white" opacity="0.45"/>
-        <circle cx="134" cy="96" r="2" fill="white" opacity="0.45"/>
+        <!-- iris -->
+        <circle cx="72" cy="92" r="10" fill="url(#irisGrad)"/>
+        <circle cx="128" cy="92" r="10" fill="url(#irisGrad)"/>
 
-        <!-- nose -->
-        <ellipse cx="99" cy="113" rx="6" ry="5.5" fill="#e08060"/>
-        <ellipse cx="96" cy="113" rx="2.5" ry="2" fill="#c4643a" opacity="0.7"/>
-        <ellipse cx="102" cy="113" rx="2.5" ry="2" fill="#c4643a" opacity="0.7"/>
+        <!-- pupils (animated) -->
+        <ellipse id="eye-l" cx="72" cy="92" rx="6" ry="6" fill="#080402"/>
+        <ellipse id="eye-r" cx="128" cy="92" rx="6" ry="6" fill="#080402"/>
+
+        <!-- eye highlights — primary + secondary -->
+        <circle cx="66" cy="86" r="3.5" fill="white"/>
+        <circle cx="122" cy="86" r="3.5" fill="white"/>
+        <circle cx="78" cy="97" r="1.6" fill="white" opacity="0.5"/>
+        <circle cx="134" cy="97" r="1.6" fill="white" opacity="0.5"/>
+
+        <!-- upper eyelid shadow (adds expressiveness) -->
+        <path d="M56 90 Q72 79 88 90" stroke="#1c0e06" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <path d="M112 90 Q128 79 144 90" stroke="#1c0e06" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+        <!-- lower eyelid line (subtle) -->
+        <path d="M58 96 Q72 103 86 96" stroke="#8a4a28" stroke-width="0.9" fill="none" opacity="0.45"/>
+        <path d="M114 96 Q128 103 142 96" stroke="#8a4a28" stroke-width="0.9" fill="none" opacity="0.45"/>
 
         <!-- cheek blush -->
-        <ellipse cx="50" cy="108" rx="19" ry="12" fill="#ff8080" opacity="0.1"/>
-        <ellipse cx="150" cy="108" rx="19" ry="12" fill="#ff8080" opacity="0.1"/>
+        <ellipse cx="46" cy="112" rx="22" ry="13" fill="#e86060" opacity="0.09"/>
+        <ellipse cx="154" cy="112" rx="22" ry="13" fill="#e86060" opacity="0.09"/>
 
-        <!-- mustache -->
-        <path d="M70 123 Q84 115 100 120 Q116 115 130 123" stroke="#1a0d06" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <!-- nose — bridge + nostrils, natural -->
+        <path d="M98 106 Q95 116 91 122" stroke="#a05e30" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <path d="M102 106 Q105 116 109 122" stroke="#a05e30" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="94" cy="123" rx="5.5" ry="3.5" fill="#a86038"/>
+        <ellipse cx="106" cy="123" rx="5.5" ry="3.5" fill="#a86038"/>
+        <ellipse cx="100" cy="122" rx="3" ry="2" fill="#c07848" opacity="0.6"/>
 
-        <!-- mouth interior (renders behind lips) -->
-        <ellipse id="mouth-inner" cx="100" cy="145" rx="0" ry="0" fill="#2a0806"/>
-        <!-- teeth row -->
-        <rect id="teeth" x="100" y="135" width="0" height="0" fill="#f5f0e8" rx="3"/>
-        <!-- lower lip -->
-        <path id="mouth-lo" d="M73 134 Q100 155 127 134" stroke="#a85028" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- upper lip (topmost) -->
-        <path id="mouth" d="M73 134 Q100 155 127 134" stroke="#c06840" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <!-- ── MOUTH SYSTEM (rendered back-to-front) ── -->
+        <!-- 1. inner mouth (shows when open — warm red, not black) -->
+        <ellipse id="mouth-inner" cx="100" cy="150" rx="0" ry="0" fill="#bf3030"/>
+        <!-- 2. teeth row -->
+        <rect id="teeth" x="100" y="138" width="0" height="0" fill="#f5f0e8" rx="4"/>
+        <!-- 3. lower lip -->
+        <path id="mouth-lo" d="M76 138 Q100 158 124 138 Q112 162 100 163 Q88 162 76 138 Z" fill="#c86848"/>
+        <!-- 4. upper lip (topmost) -->
+        <path id="mouth" d="M76 138 Q87 134 100 136 Q113 134 124 138 Q113 143 100 144 Q87 143 76 138 Z" fill="#b85c3c"/>
       </svg>
     </div>
 
@@ -456,10 +476,11 @@ function triggerAvatarAnim(cls) {
   if (cls) svg.classList.add(cls);
 }
 
-function setMouthClosed(path) {
-  const p = path || 'M73 134 Q100 155 127 134';
-  document.getElementById('mouth').setAttribute('d', p);
-  document.getElementById('mouth-lo').setAttribute('d', p);
+function setMouthClosed(upPath, loPath) {
+  const defUp = 'M76 138 Q87 134 100 136 Q113 134 124 138 Q113 143 100 144 Q87 143 76 138 Z';
+  const defLo = 'M76 138 Q100 158 124 138 Q112 162 100 163 Q88 162 76 138 Z';
+  document.getElementById('mouth').setAttribute('d', upPath || defUp);
+  document.getElementById('mouth-lo').setAttribute('d', loPath || defLo);
   const inner = document.getElementById('mouth-inner');
   inner.setAttribute('rx', '0'); inner.setAttribute('ry', '0');
   const teeth = document.getElementById('teeth');
@@ -472,45 +493,68 @@ function animateExpression(mood) {
   const eyeL  = document.getElementById('eye-l');
   const eyeR  = document.getElementById('eye-r');
 
-  browL.setAttribute('d', 'M57 74 Q73 63 89 74');
-  browR.setAttribute('d', 'M111 74 Q127 63 143 74');
-  eyeL.setAttribute('ry', '11'); eyeR.setAttribute('ry', '11');
+  // reset neutral
+  browL.setAttribute('d', 'M57 76 C65 69,78 67,93 71 C92 76,78 73,57 80 Z');
+  browR.setAttribute('d', 'M107 71 C122 67,135 69,143 76 C143 80,122 73,107 76 Z');
+  eyeL.setAttribute('ry', '6'); eyeR.setAttribute('ry', '6');
   setMouthClosed();
 
   if (mood === 'impressed' || mood === 'proud' || mood === 'shocked') {
-    browL.setAttribute('d', 'M57 66 Q73 54 89 66');
-    browR.setAttribute('d', 'M111 66 Q127 54 143 66');
-    setMouthClosed('M70 130 Q100 162 130 130');
-    eyeL.setAttribute('ry', '14'); eyeR.setAttribute('ry', '14');
+    // brows high, eyes wide, big open smile
+    browL.setAttribute('d', 'M57 68 C65 61,78 59,93 63 C92 68,78 65,57 72 Z');
+    browR.setAttribute('d', 'M107 63 C122 59,135 61,143 68 C143 72,122 65,107 68 Z');
+    eyeL.setAttribute('ry', '9'); eyeR.setAttribute('ry', '9');
+    setMouthClosed(
+      'M72 133 Q86 128 100 130 Q114 128 128 133 Q116 140 100 141 Q84 140 72 133 Z',
+      'M72 133 Q100 156 128 133 Q116 164 100 165 Q84 164 72 133 Z'
+    );
+
   } else if (mood === 'disappointed') {
-    browL.setAttribute('d', 'M57 78 Q73 70 89 64');
-    browR.setAttribute('d', 'M111 64 Q127 70 143 78');
-    setMouthClosed('M73 148 Q100 134 127 148');
+    // inner brow corners UP (worried), frown, head shake
+    browL.setAttribute('d', 'M57 80 C65 73,78 68,93 64 C92 68,78 73,57 84 Z');
+    browR.setAttribute('d', 'M107 64 C122 68,135 73,143 80 C143 84,122 73,107 68 Z');
+    setMouthClosed(
+      'M74 150 Q87 143 100 145 Q113 143 126 150 Q114 156 100 157 Q86 156 74 150 Z',
+      'M74 150 Q100 144 126 150 Q114 158 100 159 Q86 158 74 150 Z'
+    );
     triggerAvatarAnim('avatar-shake');
+
   } else if (mood === 'amused') {
-    eyeL.setAttribute('ry', '5'); eyeR.setAttribute('ry', '5');
-    browL.setAttribute('d', 'M57 71 Q73 62 89 71');
-    browR.setAttribute('d', 'M111 71 Q127 62 143 71');
-    setMouthClosed('M62 128 Q100 168 138 128');
+    // squinting eyes, huge grin, shoulder bounce
+    eyeL.setAttribute('ry', '3'); eyeR.setAttribute('ry', '3');
+    browL.setAttribute('d', 'M57 73 C65 66,78 64,93 68 C92 73,78 70,57 77 Z');
+    browR.setAttribute('d', 'M107 68 C122 64,135 66,143 73 C143 77,122 70,107 73 Z');
+    setMouthClosed(
+      'M68 132 Q84 126 100 128 Q116 126 132 132 Q119 140 100 141 Q81 140 68 132 Z',
+      'M68 132 Q100 160 132 132 Q118 168 100 169 Q82 168 68 132 Z'
+    );
     triggerAvatarAnim('avatar-bounce');
+
   } else if (mood === 'confused') {
-    browL.setAttribute('d', 'M57 66 Q73 55 89 68');
-    browR.setAttribute('d', 'M111 76 Q127 68 143 72');
-    setMouthClosed('M73 140 Q92 128 100 136 Q108 144 127 132');
+    // asymmetric brows, twisted mouth
+    browL.setAttribute('d', 'M57 69 C65 62,78 61,93 65 C92 70,78 67,57 73 Z');
+    browR.setAttribute('d', 'M107 73 C122 70,135 72,143 77 C143 81,122 76,107 77 Z');
+    setMouthClosed(
+      'M76 141 Q88 135 100 138 Q112 143 124 139 Q112 146 100 147 Q88 144 76 145 Z',
+      'M76 141 Q100 158 124 139 Q113 161 100 162 Q87 160 76 141 Z'
+    );
   }
 }
 
 /* ── Mouth animation — 3 frames ── */
 const MOUTH_FRAMES = [
-  // 0 closed
-  { up: 'M73 134 Q100 155 127 134', lo: 'M73 134 Q100 155 127 134',
-    irx: 0,  iry: 0,  icy: 145, tx: 100, ty: 135, tw: 0,  th: 0  },
-  // 1 half-open
-  { up: 'M75 133 Q100 146 125 133', lo: 'M75 149 Q100 163 125 149',
-    irx: 23, iry: 9,  icy: 148, tx: 82,  ty: 134, tw: 36, th: 10 },
-  // 2 fully open — teeth visible
-  { up: 'M75 129 Q100 141 125 129', lo: 'M75 157 Q100 171 125 157',
-    irx: 29, iry: 16, icy: 153, tx: 79,  ty: 130, tw: 42, th: 11 }
+  // 0 closed — full natural lips
+  { up: 'M76 138 Q87 134 100 136 Q113 134 124 138 Q113 143 100 144 Q87 143 76 138 Z',
+    lo: 'M76 138 Q100 158 124 138 Q112 162 100 163 Q88 162 76 138 Z',
+    irx: 0,  iry: 0,  icy: 150, tx: 100, ty: 140, tw: 0,  th: 0  },
+  // 1 half-open — teeth start to show
+  { up: 'M76 134 Q88 129 100 131 Q112 129 124 134 Q113 139 100 140 Q87 139 76 134 Z',
+    lo: 'M77 151 Q100 166 123 151 Q112 169 100 170 Q88 169 77 151 Z',
+    irx: 21, iry: 8,  icy: 152, tx: 83,  ty: 135, tw: 34, th: 11 },
+  // 2 fully open — wide open, teeth clearly visible
+  { up: 'M75 130 Q88 125 100 127 Q112 125 125 130 Q113 135 100 136 Q87 135 75 130 Z',
+    lo: 'M77 158 Q100 174 123 158 Q113 174 100 175 Q87 174 77 158 Z',
+    irx: 27, iry: 14, icy: 158, tx: 81,  ty: 131, tw: 38, th: 13 }
 ];
 
 function applyMouthFrame(f) {
