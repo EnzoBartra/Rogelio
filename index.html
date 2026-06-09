@@ -345,29 +345,51 @@ const TOPICS = {
   finance: "Talk about economics, markets, investing, commodities, career in finance. Use conversational language, introduce useful vocabulary naturally."
 };
 
-let history = [], topic = "casual", scores = [], listening = false, mouthTimer = null, recognition = null, selectedVoice = null, finalTranscript = '';
+let history = [], topic = "casual", scores = [], listening = false, mouthTimer = null,
+    recognition = null, selectedVoice = null, finalTranscript = '',
+    userLevel = 1, correctCount = 0, wordsLearned = [], sessionCount = 0;
 
 function systemPrompt() {
-  return `You are Rogelio, a funny, direct, slightly sarcastic but warm male English-speaking colleague in his 30s. You help a beginner Argentine Spanish speaker practice natural conversational English. They know basics but make grammar mistakes.
+  const LEVEL_GUIDE = [
+    '',
+    'NIVEL 1: Usá frases de 2-3 palabras. Temas: saludos (hello, hi, bye, yes, no), colores básicos, números 1-5.',
+    'NIVEL 2: Frases de 3-4 palabras. Temas: presentarse (My name is...), números 1-20, colores, familia (mom, dad).',
+    'NIVEL 3: Frases de 4-5 palabras. Temas: "I like...", "I have...", comida básica, animales.',
+    'NIVEL 4: Oraciones simples. Temas: rutina diaria (I wake up, I eat breakfast), días de la semana.',
+    'NIVEL 5: Oraciones completas. Temas: hobbies, trabajo básico, "I want to...", "I need to..."',
+    'NIVEL 6: Oraciones con conectores (because, but, and). Temas: describir personas, opiniones simples.',
+    'NIVEL 7: Pasado simple, modales (can, should, would). Temas: experiencias, planes futuros.',
+    'NIVEL 8: Phrasal verbs comunes, condicionales simples. Temas: variados.',
+    'NIVEL 9: Vocabulario amplio, expresiones naturales. Conversación fluida.',
+    'NIVEL 10: Intermedio. Cualquier tema con gramática variada y espontaneidad.'
+  ];
+  const recent = wordsLearned.slice(-8).join(', ');
+  return `Sos Rogelio, un profesor de inglés paciente, directo y gracioso para hispanohablantes principiantes.
 
-Topic: ${TOPICS[topic]}
+NIVEL ACTUAL DEL ALUMNO: ${userLevel}/10
+${LEVEL_GUIDE[userLevel]}
 
-RULES:
-1. Reply in 1-2 sentences MAX. Short and punchy. Use casual connectors: "you know", "I mean", "honestly", "kind of".
-2. Show personality — make jokes, tease them gently when they make mistakes, be encouraging but real.
-3. After every reply add this block EXACTLY:
+REGLAS ABSOLUTAS:
+1. Respondés en inglés con máximo 1-2 oraciones MUY cortas y simples, adaptadas al nivel.
+2. Usás español para explicar correcciones, gramática y vocabulario nuevo.
+3. Siempre terminás con una pregunta simple para seguir la conversación.
+4. Nunca usás palabras difíciles sin explicarlas primero en español.
+5. Sos directo y gracioso, no formal ni aburrido.
+6. Si el alumno escribe en español, respondés en inglés y le mostrás cómo decirlo.
+7. Adaptás la complejidad EXACTAMENTE al nivel indicado.
+${recent ? `\nPALABRAS YA APRENDIDAS (no las repitas como vocabulario nuevo): ${recent}` : ''}
+
+Contexto del tema: ${TOPICS[topic]}
+
+Después de cada respuesta incluí este bloque EXACTAMENTE:
 
 <<<FB
-GOOD:[una cosa que hicieron bien, escrita en español]
-FIX:[corrección principal: MAL → BIEN: razón breve en español. Escribe "Perfect!" si no hay nada que corregir.]
-VOCAB:[una palabra/frase útil: PALABRA — definición y ejemplo corto, en español]
+GOOD:[una cosa que hicieron bien, en español]
+FIX:[corrección: MAL → BIEN: razón breve en español. Escribe "Perfect!" si no hay nada que corregir.]
+VOCAB:[una palabra útil nueva: PALABRA — definición y ejemplo corto, en español]
 SCORE:[entero del 1 al 10]
 MOOD:[una palabra: proud / confused / impressed / disappointed / amused / shocked]
-FB>>>
-
-4. If they write in Spanish, reply in English, note it gently, show them how to say it in English.
-5. If they say "I don't know how to say", help them find the expression.
-6. Never break character. You are Rogelio, not an AI.`;
+FB>>>`;
 }
 
 function parse(text) {
@@ -377,6 +399,36 @@ function parse(text) {
   const reply = text.replace(/<<<FB[\s\S]*?FB>>>/, '').trim();
   const get = k => { const r = raw.match(new RegExp(`${k}:(.+)`)); return r ? r[1].trim() : null; };
   return { reply, fb: { good: get('GOOD'), fix: get('FIX'), vocab: get('VOCAB'), score: parseInt(get('SCORE'))||null, mood: get('MOOD') } };
+}
+
+/* ── Progress / localStorage ── */
+function loadProgress() {
+  try {
+    const p = JSON.parse(localStorage.getItem('rogelio_progress') || '{}');
+    userLevel    = Math.min(Math.max(p.level || 1, 1), 10);
+    correctCount = p.correctCount || 0;
+    wordsLearned = p.wordsLearned || [];
+    sessionCount = (p.sessionCount || 0) + 1;
+  } catch(e) {}
+  saveProgress();
+}
+
+function saveProgress() {
+  try {
+    localStorage.setItem('rogelio_progress', JSON.stringify(
+      { level: userLevel, correctCount, wordsLearned, sessionCount }
+    ));
+  } catch(e) {}
+}
+
+function getInitialGreeting() {
+  if (sessionCount > 1) {
+    if (userLevel <= 2) return `Hello again! Good to see you! Level ${userLevel}. Say: "Hello, Rogelio!"`;
+    if (userLevel <= 4) return `Hey, welcome back! Level ${userLevel}. Ready to practice?`;
+    if (userLevel <= 7) return `Hey! Good to see you. Level ${userLevel} — let's keep going! What's up?`;
+    return `Welcome back! Level ${userLevel} — you're getting really good! What do you want to talk about?`;
+  }
+  return `Hello! I am Rogelio. Nice to meet you! Can you say: "Hello, Rogelio!"?`;
 }
 
 /* ── Expressions ── */
@@ -460,6 +512,10 @@ function speak(text) {
   u.onend   = () => { setStatus(''); animMouth(false); micBtn.classList.remove('mic-disabled'); };
   speechSynthesis.speak(u);
 }
+loadProgress();
+const _firstMsg = document.querySelector('#chat .msg-rogelio .msg-text');
+if (_firstMsg) _firstMsg.textContent = getInitialGreeting();
+
 populateVoices();
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = populateVoices;
 
@@ -511,6 +567,23 @@ function showFeedback(fb) {
     const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
     document.getElementById('score-fill').style.width = (avg * 10) + '%';
     document.getElementById('score-num').textContent = `${avg}/10`;
+
+    if (fb.score >= 7) {
+      correctCount++;
+      if (correctCount >= 5 && userLevel < 10) {
+        userLevel++;
+        correctCount = 0;
+        setTimeout(() => addBubble('system', `🎉 ¡Subiste al nivel ${userLevel}/10! Rogelio está orgulloso.`), 400);
+      }
+      saveProgress();
+    }
+  }
+  if (fb.vocab) {
+    const word = fb.vocab.split(/[—\-]/)[0].trim().split(/\s+/)[0].toUpperCase();
+    if (word.length > 1 && !wordsLearned.includes(word)) {
+      wordsLearned = [...wordsLearned.slice(-49), word];
+      saveProgress();
+    }
   }
   if (fb.mood) setMood(fb.mood);
 }
