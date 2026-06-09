@@ -400,7 +400,7 @@ const TOPICS = {
   finance: "Talk about economics, markets, investing, commodities, career in finance. Use conversational language, introduce useful vocabulary naturally."
 };
 
-let history = [], topic = "casual", scores = [], listening = false, mouthTimer = null, recognition = null, selectedVoice = null;
+let history = [], topic = "casual", scores = [], listening = false, mouthTimer = null, recognition = null, selectedVoice = null, finalTranscript = '';
 
 function systemPrompt() {
   return `You are Rogelio, a funny, direct, slightly sarcastic but warm male English-speaking colleague in his 30s. You help a beginner Argentine Spanish speaker practice natural conversational English. They know basics but make grammar mistakes.
@@ -700,32 +700,48 @@ function toggleMic() {
   if (listening) { recognition.stop(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.lang = 'en-US'; recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  finalTranscript = '';
+
   recognition.onstart = () => {
     listening = true;
     document.getElementById('mic-btn').classList.add('mic-on');
     setStatus('listening');
     speechSynthesis.cancel();
-    setHint('Escuchando... hablá ahora');
+    setHint('Escuchando... clic en 🎤 para parar');
   };
+
   recognition.onresult = e => {
-    const t = Array.from(e.results).map(r => r[0].transcript).join('');
-    document.getElementById('msg').value = t;
-    if (e.results[e.results.length - 1].isFinal) {
-      listening = false;
-      document.getElementById('mic-btn').classList.remove('mic-on');
-      setStatus(''); setHint(''); send();
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript + ' ';
+      } else {
+        interim += e.results[i][0].transcript;
+      }
     }
+    const ta = document.getElementById('msg');
+    ta.value = (finalTranscript + interim).trim();
+    grow(ta);
   };
-  recognition.onerror = () => {
+
+  recognition.onerror = e => {
+    if (e.error === 'no-speech') return; // silently ignore, keep listening
     listening = false;
     document.getElementById('mic-btn').classList.remove('mic-on');
     setStatus(''); setHint('No te escuché — intentá de nuevo');
   };
+
   recognition.onend = () => {
     listening = false;
     document.getElementById('mic-btn').classList.remove('mic-on');
+    setStatus('');
+    const ta = document.getElementById('msg');
+    setHint(ta.value.trim() ? 'Enter o ➤ para enviar' : '');
   };
+
   recognition.start();
 }
 </script>
